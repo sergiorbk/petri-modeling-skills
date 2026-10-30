@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling==1.33.0"]
 build-backend = "hatchling.build"
 
 [project]
@@ -18,4 +18,4 @@ test = ["jsonschema>=4.18"]
 packages = ["petri_modeling_skills"]
 
 [tool.hatch.build.targets.sdist]
-include = ["petri_modeling_skills", "tests", "README.md", "LICENSE", "NOTICE", "pyproject.toml"]
+include = ["petri_modeling_skills", "tests", "scripts", "README.md", "LICENSE", "NOTICE", "pyproject.toml"]
