@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sergiorbk/petri-modeling-skills/schemas/petri-image-observation.schema.json",
+  "title": "Petri net image observation",
+  "description": "An intermediate visual reading with local IDs and explicit uncertainty, not an application import API or certified detection-label format.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "source_image", "analysis_image", "nodes", "arcs", "assumptions", "uncertainties", "canvas_transform"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "source_image": {
+      "type": "object", "additionalProperties": false,
+      "required": ["width", "height"],
+      "properties": {"width": {"$ref": "#/$defs/knownDimension"}, "height": {"$ref": "#/$defs/knownDimension"}}
+    },
+    "analysis_image": {
+      "type": "object", "additionalProperties": false,
+      "required": ["width", "height", "preprocessing", "source_to_analysis"],
+      "properties": {
+        "width": {"$ref": "#/$defs/knownDimension"},
+        "height": {"$ref": "#/$defs/knownDimension"},
+        "preprocessing": {"type": "array", "items": {"type": "string", "enum": ["crop", "rotate", "perspective-correction", "resize"]}, "uniqueItems": true},
+        "source_to_analysis": {"description": "Known homogeneous source-to-analysis pixel transform as a row-major 3x3 matrix, or null when not known.", "anyOf": [{"type": "null"}, {"$ref": "#/$defs/homography"}]}
+      }
+    },
+    "nodes": {"type": "array", "items": {"$ref": "#/$defs/node"}},
+    "arcs": {"type": "array", "items": {"$ref": "#/$defs/arc"}},
+    "frames": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "label", "bounds", "member_ids", "semantics", "provenance"],
+        "properties": {
+          "id": {"type": "string", "minLength": 1},
+          "label": {"type": ["string", "null"]},
+          "bounds": {"$ref": "#/$defs/bounds"},
+          "member_ids": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+          "semantics": {"type": "string", "enum": ["visual-group", "petri-object", "unknown"]},
+          "provenance": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidence"}}
+        }
+      }
+    },
+    "assumptions": {"type": "array", "items": {"type": "string", "minLength": 1}},
+    "uncertainties": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["element_id", "field", "description", "blocking"],
+        "properties": {
+          "element_id": {"type": ["string", "null"]},
+          "field": {"type": "string", "minLength": 1},
+          "description": {"type": "string", "minLength": 1},
+          "blocking": {"type": "boolean"}
+        }
+      }
+    },
+    "canvas_transform": {
+      "description": "Canvas coordinates equal analysis-image coordinates times scale plus offsets. Null means the transform has not been established.",
+      "type": ["object", "null"], "additionalProperties": false,
+      "required": ["scale", "offset_x", "offset_y"],
+      "properties": {"scale": {"type": "number", "exclusiveMinimum": 0}, "offset_x": {"type": "number"}, "offset_y": {"type": "number"}}
+    }
+  },
+  "$defs": {
+    "knownDimension": {"type": ["integer", "null"], "minimum": 1},
+    "homography": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "array", "minItems": 3, "maxItems": 3, "items": {"type": "number"}}},
+    "bounds": {
+      "description": "Approximate visible bounds in the declared analysis-image pixel space; record assumption provenance when estimated.",
+      "type": ["object", "null"], "additionalProperties": false,
+      "required": ["x", "y", "width", "height"],
+      "properties": {"x": {"type": "number"}, "y": {"type": "number"}, "width": {"type": "number", "exclusiveMinimum": 0}, "height": {"type": "number", "exclusiveMinimum": 0}}
+    },
+    "point": {
+      "type": "object", "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {"x": {"type": "number"}, "y": {"type": "number"}}
+    },
+    "evidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["field", "basis", "evidence"],
+      "properties": {
+        "field": {"type": "string", "minLength": 1},
+        "basis": {"type": "string", "enum": ["observed", "assumed", "unknown"]},
+        "evidence": {"type": "string", "minLength": 1}
+      }
+    },
+    "node": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "type", "label", "marking", "bounds", "provenance"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "type": {"type": "string", "enum": ["place", "transition", "unknown"]},
+        "label": {"type": ["string", "null"]},
+        "marking": {"type": ["integer", "null"], "minimum": 0},
+        "bounds": {"$ref": "#/$defs/bounds"},
+        "parameters": {
+          "description": "Explicitly written parameters, not values inferred from node appearance.",
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["name", "value", "unit", "provenance"],
+            "properties": {
+              "name": {"type": "string", "minLength": 1},
+              "value": {"type": ["string", "number", "null"]},
+              "unit": {"type": ["string", "null"]},
+              "provenance": {"$ref": "#/$defs/evidence"}
+            }
+          }
+        },
+        "provenance": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidence"}}
+      },
+      "allOf": [{"if": {"properties": {"type": {"const": "transition"}}}, "then": {"properties": {"marking": {"type": "null"}}}}]
+    },
+    "arc": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "source", "target", "direction", "kind", "weight", "points", "provenance"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "source": {"type": ["string", "null"]},
+        "target": {"type": ["string", "null"]},
+        "direction": {"type": "string", "enum": ["source-to-target", "unknown"]},
+        "kind": {"type": "string", "enum": ["ordinary", "read", "inhibitor", "unknown"]},
+        "weight": {"type": ["integer", "null"], "minimum": 1},
+        "points": {"type": "array", "items": {"$ref": "#/$defs/point"}},
+        "provenance": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/evidence"}}
+      }
+    }
+  }
+}

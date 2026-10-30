@@ -18,6 +18,7 @@ and workflows without copying the shared modeling rules.
 | `pattern-catalog` | Arrivals, queues, service, resources, branching, assembly and transport |
 | `pnml-standard` | P/T net interchange, references, extensions and validation |
 | `petri-training-export` | Auditable ZIP exports with real session evidence for LLM training |
+| `petri-image-reconstruction` | Interpret a supplied net photo or diagram and rebuild its observed graph through available application tools |
 
 `petri_modeling_skills/manifest.json` lists the allowlisted resources and package
 version. Each `SKILL.md` declares its own name and description. References are
@@ -46,6 +47,10 @@ installed wheel without the source checkout.
 `read_schema("training-bundle")` returns the canonical JSON schema for training ZIP
 manifests and their individual JSON artifacts. Schemas have their own manifest
 allowlist and are not concatenated into modeling guidance as if they were Markdown.
+`read_schema("petri-image-observation")` provides an optional intermediate format for
+visual observations, local IDs, layout transforms and explicit uncertainties. The
+external vision client performs recognition; this package adds no OCR dependency or
+image-upload service. The observation schema does not alter the training ZIP contract.
 
 ## Java and other clients
 

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "petri-modeling-skills"
-version = "0.2.0"
+version = "0.3.0"
 description = "Shared skills for modeling, explaining and validating Petri nets"
 readme = "README.md"
 requires-python = ">=3.10"

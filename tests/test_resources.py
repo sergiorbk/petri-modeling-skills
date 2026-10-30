@@ -12,7 +12,7 @@ import petri_modeling_skills as skills
 class ResourceTests(unittest.TestCase):
     def test_catalog_entries_resolve_to_real_documents(self):
         entries = skills.catalog()
-        self.assertEqual(5, len(entries))
+        self.assertEqual(6, len(entries))
         self.assertEqual(len(entries), len({entry["id"] for entry in entries}))
         for entry in entries:
             self.assertTrue(entry["name"])
@@ -70,8 +70,8 @@ class ResourceTests(unittest.TestCase):
             result = subprocess.run([sys.executable, "-I", "-c", script, str(archive)],
                                     cwd=temporary, check=True, capture_output=True, text=True)
             version, count, length = json.loads(result.stdout)
-            self.assertEqual("0.2.0", version)
-            self.assertEqual(5, count)
+            self.assertEqual("0.3.0", version)
+            self.assertEqual(6, count)
             self.assertGreater(length, 1000)
 
     def test_json_schemas_use_a_separate_allowlist_and_are_not_prompt_text(self):
