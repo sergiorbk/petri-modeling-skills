@@ -1,9 +1,13 @@
 {
-  "version": "0.1.0",
+  "version": "0.2.0",
   "resources": [
     {"id": "petri-modeling", "path": "skills/petri-modeling/SKILL.md"},
     {"id": "petri-patterns", "path": "skills/petri-patterns/SKILL.md"},
     {"id": "pattern-catalog", "path": "skills/petri-patterns/references/pattern-catalog.md", "name": "Petri modeling pattern catalog", "description": "Select production and queueing building blocks by their behavior and resource semantics."},
-    {"id": "pnml-standard", "path": "skills/pnml-standard/SKILL.md"}
+    {"id": "pnml-standard", "path": "skills/pnml-standard/SKILL.md"},
+    {"id": "petri-training-export", "path": "skills/petri-training-export/SKILL.md"}
+  ],
+  "schemas": [
+    {"id": "training-bundle", "path": "schemas/training-bundle.schema.json"}
   ]
 }

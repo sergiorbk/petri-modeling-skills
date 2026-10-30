@@ -12,7 +12,7 @@ import petri_modeling_skills as skills
 class ResourceTests(unittest.TestCase):
     def test_catalog_entries_resolve_to_real_documents(self):
         entries = skills.catalog()
-        self.assertEqual(4, len(entries))
+        self.assertEqual(5, len(entries))
         self.assertEqual(len(entries), len({entry["id"] for entry in entries}))
         for entry in entries:
             self.assertTrue(entry["name"])
@@ -70,9 +70,19 @@ class ResourceTests(unittest.TestCase):
             result = subprocess.run([sys.executable, "-I", "-c", script, str(archive)],
                                     cwd=temporary, check=True, capture_output=True, text=True)
             version, count, length = json.loads(result.stdout)
-            self.assertEqual("0.1.0", version)
-            self.assertEqual(4, count)
+            self.assertEqual("0.2.0", version)
+            self.assertEqual(5, count)
             self.assertGreater(length, 1000)
+
+    def test_json_schemas_use_a_separate_allowlist_and_are_not_prompt_text(self):
+        schema = skills.read_schema("training-bundle")
+        self.assertEqual("1.0", schema["properties"]["schema_version"]["const"])
+        schema["properties"].clear()
+        self.assertIn("schema_version", skills.read_schema("training-bundle")["properties"])
+        self.assertNotIn('"$schema"', skills.modeling_guidance())
+        for identifier in ["unknown", "../LICENSE", "training-bundle.schema.json"]:
+            with self.assertRaises(KeyError):
+                skills.read_schema(identifier)
 
 
 if __name__ == "__main__":

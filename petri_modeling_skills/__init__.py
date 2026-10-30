@@ -81,3 +81,15 @@ def read_resource(uri: str) -> str:
 def modeling_guidance() -> str:
     """Assemble the shared guide for a cached application system prompt."""
     return "\n\n".join(_document(entry)[1] for entry in _entries())
+
+
+def read_schema(identifier: str) -> dict:
+    """Read a canonical JSON schema by manifest id, without treating it as guide text."""
+    for entry in _manifest().get("schemas", []):
+        if entry["id"] != identifier:
+            continue
+        path = PurePosixPath(entry["path"])
+        if path.is_absolute() or ".." in path.parts or "\\" in entry["path"]:
+            raise ValueError(f"Invalid schema path: {entry['path']}")
+        return json.loads(files(__package__).joinpath(*path.parts).read_text(encoding="utf-8"))
+    raise KeyError(f"Unknown modeling schema: {identifier}")

@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sergiorbk/petri-modeling-skills/schemas/training-bundle.schema.json",
+  "title": "Petri modeling training bundle manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "title", "created_at", "app", "shared_skills", "status", "capture_scope", "files", "missing_data"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "title": {"type": "string", "minLength": 1},
+    "created_at": {"$ref": "#/$defs/utcTimestamp"},
+    "app": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {"name": {"type": "string", "minLength": 1}, "version": {"type": "string", "minLength": 1}}
+    },
+    "shared_skills": {
+      "type": "object", "additionalProperties": false,
+      "required": ["version", "revision"],
+      "properties": {
+        "version": {"type": "string", "minLength": 1},
+        "revision": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40,64}$"}
+      }
+    },
+    "status": {"type": "string", "enum": ["unreviewed", "accepted", "rejected"]},
+    "capture_scope": {
+      "type": "object", "additionalProperties": false,
+      "required": ["conversation", "tool_calls"],
+      "properties": {"conversation": {"$ref": "#/$defs/captureOrigin"}, "tool_calls": {"$ref": "#/$defs/captureOrigin"}}
+    },
+    "files": {
+      "type": "array", "minItems": 5, "maxItems": 9,
+      "items": {"$ref": "#/$defs/artifact"},
+      "allOf": [
+        {"contains": {"properties": {"name": {"const": "task.json"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"properties": {"name": {"const": "model.pnml"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"properties": {"name": {"const": "conversation.jsonl"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"properties": {"name": {"const": "tool-calls.jsonl"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"properties": {"name": {"const": "verification.json"}}}, "minContains": 1, "maxContains": 1},
+        {"contains": {"properties": {"name": {"const": "screenshot.png"}}}, "minContains": 0, "maxContains": 1},
+        {"contains": {"properties": {"name": {"const": "network.png"}}}, "minContains": 0, "maxContains": 1},
+        {"contains": {"properties": {"name": {"const": "model-geometry.json"}}}, "minContains": 0, "maxContains": 1},
+        {"contains": {"properties": {"name": {"const": "editor-observations.json"}}}, "minContains": 0, "maxContains": 1}
+      ]
+    },
+    "missing_data": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["artifact", "reason"],
+        "properties": {"artifact": {"type": "string", "minLength": 1}, "reason": {"type": "string", "minLength": 1}}
+      }
+    }
+  },
+  "allOf": [
+    {"if": {"properties": {"files": {"contains": {"properties": {"name": {"const": "model-geometry.json"}}}}}},
+     "then": {"properties": {"files": {"contains": {"properties": {"name": {"const": "network.png"}}}}}}}
+  ],
+  "$defs": {
+    "utcTimestamp": {"type": "string", "format": "date-time", "pattern": "(?:Z|\\+00:00)$"},
+    "captureOrigin": {"type": "string", "enum": ["application", "client-provided", "unavailable"]},
+    "artifact": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "media_type", "sha256", "purpose"],
+      "properties": {
+        "name": {"type": "string", "enum": ["task.json", "model.pnml", "conversation.jsonl", "tool-calls.jsonl", "verification.json", "screenshot.png", "network.png", "model-geometry.json", "editor-observations.json"]},
+        "media_type": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "purpose": {"type": "string", "minLength": 1}
+      }
+    },
+    "task": {
+      "title": "task.json",
+      "type": "object", "additionalProperties": false,
+      "required": ["task", "clarifications", "assumptions", "acceptance"],
+      "properties": {
+        "task": {"type": ["string", "null"]},
+        "clarifications": {"type": "array", "items": {"type": "string"}},
+        "assumptions": {"type": "array", "items": {"type": "string"}},
+        "acceptance": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "conversationRecord": {
+      "title": "conversation.jsonl record",
+      "type": "object", "additionalProperties": false,
+      "required": ["role", "content"],
+      "properties": {
+        "role": {"type": "string", "enum": ["user", "assistant"]},
+        "content": {"type": "string"},
+        "timestamp": {"$ref": "#/$defs/utcTimestamp"}
+      }
+    },
+    "toolCallRecord": {
+      "title": "tool-calls.jsonl record",
+      "type": "object", "additionalProperties": false,
+      "required": ["tool", "arguments", "timestamp", "origin"],
+      "properties": {
+        "tool": {"type": "string", "minLength": 1},
+        "arguments": {"type": "object"},
+        "result": {},
+        "error": {"type": ["string", "null"]},
+        "timestamp": {"$ref": "#/$defs/utcTimestamp"},
+        "origin": {"type": "string", "enum": ["application", "client-provided"]}
+      }
+    },
+    "check": {
+      "type": "object", "additionalProperties": false,
+      "required": ["name", "status", "details"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "status": {"type": "string", "enum": ["unknown", "passed", "failed"]},
+        "details": {"type": "string"}
+      }
+    },
+    "modelGeometry": {
+      "title": "model-geometry.json",
+      "type": "object", "additionalProperties": false,
+      "required": ["coordinate_system", "image", "transform", "label_status", "elements"],
+      "properties": {
+        "coordinate_system": {"const": "image-pixels"},
+        "image": {
+          "type": "object", "additionalProperties": false,
+          "required": ["file", "width", "height"],
+          "properties": {"file": {"const": "network.png"}, "width": {"type": "integer", "minimum": 1}, "height": {"type": "integer", "minimum": 1}}
+        },
+        "transform": {
+          "type": "object", "additionalProperties": false,
+          "required": ["origin_x", "origin_y", "scale"],
+          "properties": {"origin_x": {"type": "number"}, "origin_y": {"type": "number"}, "scale": {"type": "number", "exclusiveMinimum": 0}}
+        },
+        "label_status": {"type": "string", "enum": ["renderer-derived", "unverified"]},
+        "elements": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["id", "kind", "bounds", "clipped"],
+            "properties": {
+              "id": {"type": "string", "minLength": 1},
+              "kind": {"type": "string", "enum": ["place", "transition", "arc", "object", "label"]},
+              "bounds": {
+                "type": "object", "additionalProperties": false,
+                "required": ["x", "y", "width", "height"],
+                "properties": {"x": {"type": "number"}, "y": {"type": "number"}, "width": {"type": "number", "minimum": 0}, "height": {"type": "number", "minimum": 0}}
+              },
+              "clipped": {"type": "boolean"}
+            }
+          }
+        }
+      }
+    },
+    "verification": {
+      "title": "verification.json",
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "checks", "simulation"],
+      "properties": {
+        "status": {"type": "string", "enum": ["unknown", "passed", "failed"]},
+        "checks": {"type": "array", "items": {"$ref": "#/$defs/check"}},
+        "simulation": {
+          "type": ["object", "null"], "additionalProperties": false,
+          "required": ["parameters", "results", "provenance"],
+          "properties": {"parameters": {"type": "object"}, "results": {"type": "object"}, "provenance": {"type": "string", "minLength": 1}}
+        }
+      },
+      "allOf": [
+        {"if": {"properties": {"status": {"const": "passed"}}}, "then": {"properties": {"checks": {"minItems": 1, "items": {"properties": {"status": {"const": "passed"}}}}}}},
+        {"if": {"properties": {"status": {"const": "failed"}}}, "then": {"properties": {"checks": {"contains": {"properties": {"status": {"const": "failed"}}}}}}}
+      ]
+    }
+  }
+}

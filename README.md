@@ -17,6 +17,7 @@ and workflows without copying the shared modeling rules.
 | `petri-patterns` | Choosing and connecting suitable building blocks |
 | `pattern-catalog` | Arrivals, queues, service, resources, branching, assembly and transport |
 | `pnml-standard` | P/T net interchange, references, extensions and validation |
+| `petri-training-export` | Auditable ZIP exports with real session evidence for LLM training |
 
 `petri_modeling_skills/manifest.json` lists the allowlisted resources and package
 version. Each `SKILL.md` declares its own name and description. References are
@@ -42,10 +43,14 @@ frontmatter. Unknown IDs, arbitrary filesystem paths and noncanonical URIs are
 rejected with `KeyError`. Loading uses Python package resources and works from an
 installed wheel without the source checkout.
 
+`read_schema("training-bundle")` returns the canonical JSON schema for training ZIP
+manifests and their individual JSON artifacts. Schemas have their own manifest
+allowlist and are not concatenated into modeling guidance as if they were Markdown.
+
 ## Java and other clients
 
 Pin this repository as a git submodule. Package `manifest.json`, `skills/**/*.md`,
-`LICENSE` and `NOTICE` as nonfiltered application resources during the build. A
+`schemas/**/*.json`, `LICENSE` and `NOTICE` as nonfiltered application resources during the build. A
 small loader reads the manifest and returns only its listed resource IDs. No
 Python interpreter is required to load the Markdown in Java.
 
@@ -61,7 +66,8 @@ Update the submodule pin deliberately and rebuild the application; runtime loadi
 does not fetch mutable remote instructions. CI checkouts must initialize submodules,
 and Docker build contexts must include the pinned source before dependency install.
 
-Run the loader tests with `python -m unittest discover -s tests`. Build a wheel with
+Install the optional `test` extra for schema validation, then run
+`python -m unittest discover -s tests`. Build a wheel with
 `python -m build` or `uv build`. Test the consuming applications' resource and prompt
 adapters after a content update. The skill folders can also be installed as standard
 `SKILL.md` skills using a client's normal skill mechanism.
