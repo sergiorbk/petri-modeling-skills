@@ -19,6 +19,7 @@ and workflows without copying the shared modeling rules.
 | `pnml-standard` | P/T net interchange, references, extensions and validation |
 | `petri-training-export` | Auditable ZIP exports with real session evidence for LLM training |
 | `petri-image-reconstruction` | Interpret a supplied net photo or diagram and rebuild its observed graph through available application tools |
+| `petri-training-review` | Review exact model revisions and interpret recorded simulation trajectories |
 
 `petri_modeling_skills/manifest.json` lists the allowlisted resources and package
 version. Each `SKILL.md` declares its own name and description. References are
@@ -58,6 +59,9 @@ allowlist and are not concatenated into modeling guidance as if they were Markdo
 visual observations, local IDs, layout transforms and explicit uncertainties. The
 external vision client performs recognition; this package adds no OCR dependency or
 image-upload service. The observation schema does not alter the training ZIP contract.
+
+`read_schema("training-history")` describes revision chains, review findings and
+execution evidence, including sampled tokens and active transition channels.
 
 ## Java and other clients
 

@@ -51,6 +51,8 @@ individual JSON artifacts. Both applications must use the same schema version.
 | `model-geometry.json` | Optional element geometry for that exact network image, with its pixel coordinate system, origin, scale and dimensions |
 | `screenshot.png` | Optional application view for human quality review |
 | `editor-observations.json` | Optional raw protocol, statistics or control values with their origin; they may be stale and do not count as verified simulation evidence |
+| `network-views.json`, `networks/object-NNNN.png`, matching `-geometry.json` | Complete expanded overview and separate expanded object subtrees, with parent/object indices |
+| `dataset-history.json`, `history/revisions/HASH/…`, `history/reviews/HASH.json` | Revision ancestry, preserved snapshots and explicit human/agent review records |
 
 The five artifacts besides `manifest.json` are always present. If a conversation or
 tool trace is unavailable, write a zero-byte JSONL file and list it in `missing_data`
@@ -63,9 +65,15 @@ media type, purpose and SHA-256 hash of the uncompressed file bytes. Do not incl
 `manifest.json` in its own hash list. Use only the canonical archive entry names,
 UTF-8 JSON/JSONL and UTF-8 PNML. Reject duplicate entry names and unsafe paths.
 
+For history-capable clients use manifest schema `1.1`; legacy snapshot-only `1.0`
+remains readable. Keep every earlier revision and review, not recursive ZIP copies.
+Review comments target an exact revision; a corrected result is a new revision.
+See [the review guide](../petri-training-review/SKILL.md) when review is requested.
+
 Store the ZIP under a sanitized, meaningful session title plus a UTC timestamp,
 for example `parallel-machines-20261030T120000Z.zip`. A useful title does not change
-the user's original task or create missing evidence.
+the user's original task or create missing evidence. For repeated exchanges include
+revision/review counters, for example `queue-r003-review002-20261030T120000Z.zip`.
 
 ## Reusable image and geometry
 
