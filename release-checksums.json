@@ -1,0 +1,20 @@
+{
+  "version": "0.3.0",
+  "files": [
+    {
+      "name": "petri_modeling_skills-0.3.0-py3-none-any.whl",
+      "sha256": "b2d0a02052c07c1959817da8ece54a4d847cec3cd88b9ece15676c203fe03fa7",
+      "size": 69470
+    },
+    {
+      "name": "petri-modeling-skills-0.3.0-resources.zip",
+      "sha256": "9004079c312ff202a05b1845da61580b8ab3b151c7ffecf77f988473e03cdbbf",
+      "size": 57928
+    },
+    {
+      "name": "petri_modeling_skills-0.3.0.tar.gz",
+      "sha256": "1f0425ac9d00f733a3d37fee8b4eb48ddc126be4dfe33ec4ac905da01545f1c8",
+      "size": 27394
+    }
+  ]
+}
