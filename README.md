@@ -33,7 +33,7 @@ and SHA-256 in their dependency configuration and lockfile; no PyPI account or
 Git submodule is needed:
 
 ```bash
-pip install https://github.com/sergiorbk/petri-modeling-skills/releases/download/v0.3.0/petri_modeling_skills-0.3.0-py3-none-any.whl
+pip install https://github.com/sergiorbk/petri-modeling-skills/releases/download/v0.4.0/petri_modeling_skills-0.4.0-py3-none-any.whl
 ```
 
 Use the installed package normally:
@@ -65,7 +65,7 @@ execution evidence, including sampled tokens and active transition channels.
 
 ## Java and other clients
 
-Download `petri-modeling-skills-0.3.0-resources.zip` from the same GitHub Release
+Download `petri-modeling-skills-0.4.0-resources.zip` from the same GitHub Release
 and verify its pinned SHA-256 before extraction. The archive contains
 `petri-modeling-skills/manifest.json`, `skills/**/*.md`, `schemas/**/*.json`,
 `LICENSE` and `NOTICE`. Maven can fetch and unpack it during generate-resources

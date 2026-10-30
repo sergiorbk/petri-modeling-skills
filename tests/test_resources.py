@@ -70,7 +70,7 @@ class ResourceTests(unittest.TestCase):
             result = subprocess.run([sys.executable, "-I", "-c", script, str(archive)],
                                     cwd=temporary, check=True, capture_output=True, text=True)
             version, count, length = json.loads(result.stdout)
-            self.assertEqual("0.3.0", version)
+            self.assertEqual("0.4.0", version)
             self.assertEqual(7, count)
             self.assertGreater(length, 1000)
 
