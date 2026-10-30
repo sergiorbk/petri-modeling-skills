@@ -1,0 +1,15 @@
+petri-modeling-skills
+
+Modeling knowledge and pattern descriptions are derived from Petri Net Sim:
+https://github.com/sergiorbk/petri-net-sim
+Expert prompt source revision: ced6f39c0207844ab757028d4df96a3d40cb2f12
+
+Primary sources:
+- backend/src/services/agent/prompts/petri_net_expert.md
+- backend/src/domain/patterns/
+- .claude/skills/pnml-standard/SKILL.md
+- backend/tests/schema/ptnet.pntd and its referenced grammar files
+
+Copyright and license notices from the source project remain applicable.
+The full PolyForm Noncommercial License 1.0.0 is provided in LICENSE.
+PNML grammar files are referenced, not redistributed by this package.
