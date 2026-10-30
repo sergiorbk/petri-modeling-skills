@@ -1,0 +1,478 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/sergiorbk/petri-modeling-skills/schemas/training-history.schema.json",
+  "title": "Portable Petri training revision and review history",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "bundle_id",
+    "head_revision_id",
+    "revisions",
+    "reviews"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0"
+    },
+    "bundle_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "head_revision_id": {
+      "$ref": "#/$defs/hash"
+    },
+    "revisions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/revision"
+      }
+    },
+    "reviews": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/$defs/hash"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "previousHash": {
+      "type": "string",
+      "pattern": "^(?:[a-f0-9]{64})?$"
+    },
+    "revision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "parent_revision_id",
+        "model_sha256"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/hash"
+        },
+        "parent_revision_id": {
+          "$ref": "#/$defs/previousHash"
+        },
+        "model_sha256": {
+          "$ref": "#/$defs/hash"
+        }
+      }
+    },
+    "reviewRecord": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reviewer",
+        "reviewer_kind",
+        "decision",
+        "comment",
+        "findings",
+        "revision_id",
+        "result_revision_id",
+        "created_at",
+        "previous_review_id",
+        "verification_status"
+      ],
+      "properties": {
+        "reviewer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reviewer_kind": {
+          "type": "string",
+          "enum": [
+            "human",
+            "agent"
+          ]
+        },
+        "decision": {
+          "type": "string",
+          "enum": [
+            "accepted",
+            "changes_requested",
+            "rejected"
+          ]
+        },
+        "comment": {
+          "type": "string",
+          "minLength": 1
+        },
+        "findings": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/finding"
+          }
+        },
+        "revision_id": {
+          "$ref": "#/$defs/hash"
+        },
+        "result_revision_id": {
+          "$ref": "#/$defs/hash"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "(?:Z|\\+00:00)$"
+        },
+        "previous_review_id": {
+          "$ref": "#/$defs/previousHash"
+        },
+        "verification_status": {
+          "const": "unknown"
+        },
+        "submitted_by": {
+          "$ref": "#/$defs/contributor"
+        },
+        "simulation": {
+          "$ref": "#/$defs/simulationEvidence"
+        }
+      }
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "severity",
+        "message"
+      ],
+      "properties": {
+        "severity": {
+          "type": "string",
+          "enum": [
+            "error",
+            "warning",
+            "suggestion"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1
+        },
+        "element_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "view_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "region": {
+          "$ref": "#/$defs/region"
+        }
+      },
+      "dependentRequired": {
+        "region": [
+          "view_id"
+        ]
+      }
+    },
+    "region": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "coordinate_system",
+        "image_sha256",
+        "x",
+        "y",
+        "width",
+        "height"
+      ],
+      "properties": {
+        "coordinate_system": {
+          "const": "image-pixels"
+        },
+        "image_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "x": {
+          "type": "number",
+          "minimum": 0
+        },
+        "y": {
+          "type": "number",
+          "minimum": 0
+        },
+        "width": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "height": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      }
+    },
+    "contributor": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "nickname": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "organization": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "group": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "contacts": {
+          "type": "string",
+          "maxLength": 2000
+        }
+      }
+    },
+    "simulationEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policy",
+        "source_model_sha256",
+        "skip_reason",
+        "automatic_runs",
+        "interactive_runs"
+      ],
+      "properties": {
+        "policy": {
+          "const": "attempt-or-reason"
+        },
+        "source_model_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "skip_reason": {
+          "type": "string",
+          "maxLength": 4000
+        },
+        "automatic_runs": {
+          "type": "array",
+          "maxItems": 8,
+          "items": {
+            "$ref": "#/$defs/simulationRun"
+          }
+        },
+        "interactive_runs": {
+          "type": "array",
+          "maxItems": 256,
+          "items": {
+            "$ref": "#/$defs/simulationRun"
+          }
+        }
+      },
+      "anyOf": [
+        {
+          "properties": {
+            "automatic_runs": {
+              "minItems": 1
+            }
+          }
+        },
+        {
+          "properties": {
+            "skip_reason": {
+              "minLength": 1,
+              "pattern": "\\S"
+            }
+          }
+        }
+      ]
+    },
+    "simulationRun": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source",
+        "source_model_sha256",
+        "created_at",
+        "status",
+        "error",
+        "start_time",
+        "horizon",
+        "elapsed_ms",
+        "protocol",
+        "protocol_truncated",
+        "initial_state",
+        "final_state",
+        "trajectory"
+      ],
+      "properties": {
+        "source": {
+          "enum": [
+            "automatic",
+            "interactive-run",
+            "interactive-animation"
+          ]
+        },
+        "source_model_sha256": {
+          "$ref": "#/$defs/hash"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "enum": [
+            "completed",
+            "failed",
+            "limit_reached",
+            "stopped"
+          ]
+        },
+        "error": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "number",
+          "minimum": 0
+        },
+        "horizon": {
+          "type": "number",
+          "minimum": 0
+        },
+        "observed_until": {
+          "type": "number",
+          "minimum": 0
+        },
+        "elapsed_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "protocol": {
+          "type": "string",
+          "maxLength": 262144
+        },
+        "protocol_truncated": {
+          "type": "boolean"
+        },
+        "initial_state": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "final_state": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "random_seed": {
+          "type": [
+            "null",
+            "integer"
+          ]
+        },
+        "randomness": {
+          "type": "string"
+        },
+        "trajectory": {
+          "$ref": "#/$defs/trajectory"
+        }
+      }
+    },
+    "trajectory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "columns",
+        "samples",
+        "requested_interval",
+        "effective_interval"
+      ],
+      "properties": {
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "object_index",
+              "name",
+              "kind",
+              "metric"
+            ],
+            "properties": {
+              "object_index": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "object_name": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              },
+              "number": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "place",
+                  "transition"
+                ]
+              },
+              "metric": {
+                "enum": [
+                  "tokens",
+                  "active_channels"
+                ]
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "samples": {
+          "type": "array",
+          "maxItems": 20001,
+          "items": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "requested_interval": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "effective_interval": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "time_unit": {
+          "const": "model-time"
+        },
+        "semantics": {
+          "type": "string"
+        },
+        "complete": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

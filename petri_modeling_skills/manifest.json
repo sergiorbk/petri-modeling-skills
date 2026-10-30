@@ -6,10 +6,12 @@
     {"id": "pattern-catalog", "path": "skills/petri-patterns/references/pattern-catalog.md", "name": "Petri modeling pattern catalog", "description": "Select production and queueing building blocks by their behavior and resource semantics."},
     {"id": "pnml-standard", "path": "skills/pnml-standard/SKILL.md"},
     {"id": "petri-training-export", "path": "skills/petri-training-export/SKILL.md"},
-    {"id": "petri-image-reconstruction", "path": "skills/petri-image-reconstruction/SKILL.md"}
+    {"id": "petri-image-reconstruction", "path": "skills/petri-image-reconstruction/SKILL.md"},
+    {"id": "petri-training-review", "path": "skills/petri-training-review/SKILL.md"}
   ],
   "schemas": [
     {"id": "training-bundle", "path": "schemas/training-bundle.schema.json"},
-    {"id": "petri-image-observation", "path": "schemas/petri-image-observation.schema.json"}
+    {"id": "petri-image-observation", "path": "schemas/petri-image-observation.schema.json"},
+    {"id": "training-history", "path": "schemas/training-history.schema.json"}
   ]
 }

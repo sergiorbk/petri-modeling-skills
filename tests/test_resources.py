@@ -12,7 +12,7 @@ import petri_modeling_skills as skills
 class ResourceTests(unittest.TestCase):
     def test_catalog_entries_resolve_to_real_documents(self):
         entries = skills.catalog()
-        self.assertEqual(6, len(entries))
+        self.assertEqual(7, len(entries))
         self.assertEqual(len(entries), len({entry["id"] for entry in entries}))
         for entry in entries:
             self.assertTrue(entry["name"])
@@ -71,12 +71,12 @@ class ResourceTests(unittest.TestCase):
                                     cwd=temporary, check=True, capture_output=True, text=True)
             version, count, length = json.loads(result.stdout)
             self.assertEqual("0.3.0", version)
-            self.assertEqual(6, count)
+            self.assertEqual(7, count)
             self.assertGreater(length, 1000)
 
     def test_json_schemas_use_a_separate_allowlist_and_are_not_prompt_text(self):
         schema = skills.read_schema("training-bundle")
-        self.assertEqual("1.0", schema["properties"]["schema_version"]["const"])
+        self.assertIn("1.1", schema["properties"]["schema_version"]["enum"])
         schema["properties"].clear()
         self.assertIn("schema_version", skills.read_schema("training-bundle")["properties"])
         self.assertNotIn('"$schema"', skills.modeling_guidance())
